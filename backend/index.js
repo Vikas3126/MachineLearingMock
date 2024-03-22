@@ -1,34 +1,16 @@
 const express = require('express');
-const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
+require('dotenv').config()
+const uploadRoute = require('./controller/routeUploade');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
+app.use(express.json());
 
-cloudinary.config({
-    cloud_name: 'dj7hhxsqq',
-    api_key: '932552733385796',
-    api_secret: '124k3Wwm-fNpzdIrueJ2gbKoP1A'
+
+app.use("/api/users" , uploadRoute);
+
+
+
+app.listen(PORT, () => {
+  console.log(`listening at http://localhost:${PORT}`);
 });
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
-app.post('/upload', upload.single('file'), (req, res) => {
-    cloudinary.uploader.upload_stream({ resource_type: "auto" },
-        (error, result) => {
-            if (error) {
-                console.error(error);
-                res.status(500).json({ error: 'Upload failed' });
-            } else {
-                res.status(200).json({ url: result.url });
-            }
-        }
-    ).end(req.file.buffer);
-});
-
-
-
-app.listen(9000,()=>{
-    console.log("server is running at port 9000");
-})
